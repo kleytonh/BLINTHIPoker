@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Poker BLINTHI</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: gold;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    button {
+      background: gold;
+      color: black;
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    #mensagem {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Poker BLINTHI</h1>
+  <p>Saldo: <span id="saldo">--</span> fichas</p>
+
+  <div>
+    <button onclick="entrarMesa(10)">Mesa R$10</button>
+    <button onclick="entrarMesa(20)">Mesa R$20</button>
+    <button onclick="entrarMesa(50)">Mesa R$50</button>
+  </div>
+
+  <div>
+    <button onclick="loginday()">Login Diário</button>
+    <button onclick="comprar(10)">Comprar R$10</button>
+  </div>
+
+  <div id="mensagem"></div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    const base = 'https://SEU_BACKEND.herokuapp.com'; // Substitua depois
+
+    async function fetchSaldo() {
+      const res = await fetch(`${base}/saldo/${tg.initDataUnsafe.user.id}`);
+      const data = await res.json();
+      document.getElementById('saldo').innerText = data.saldo;
+    }
+
+    async function loginday() {
+      const res = await fetch(`${base}/logindiario`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ initData: tg.initData })
+      });
+      const data = await res.json();
+      mostrar(data.mensagem);
+      fetchSaldo();
+    }
+
+    async function comprar(valor) {
+      const res = await fetch(`${base}/comprar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ initData: tg.initData, valor })
+      });
+      const data = await res.json();
+      mostrar(data.mensagem);
+      fetchSaldo();
+    }
+
+    async function entrarMesa(valor) {
+      const res = await fetch(`${base}/entrarNaMesa`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ initData: tg.initData, valor })
+      });
+      const data = await res.json();
+      mostrar(data.mensagem);
+      fetchSaldo();
+    }
+
+    function mostrar(msg) {
+      document.getElementById('mensagem').innerText = msg;
+    }
+
+    fetchSaldo();
+  </script>
+</body>
+</html>
